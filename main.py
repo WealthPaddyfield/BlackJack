@@ -51,8 +51,8 @@ def main_menu():
     background = load_menu_background(menu_background_path)
     background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # 画面サイズに調整
 
-    selected_option = 0  # 選択肢のインデックス
-    options = ["Start Game","How to play", "Exit"]
+    selected_option = -1  # 現在選択されているオプションのインデックス (-1は何も選択されていない状態)
+    options = ["Start Game", "How to play","Exit"]
 
     # フォントを指定
     font_path = os.path.join(current_dir, "Game", "assets", "fonts", "NotoSans-Italic-VariableFont_wdth,wght.ttf")  # フォントファイルのパス
@@ -60,27 +60,18 @@ def main_menu():
     menu_font = pygame.font.Font(font_path, font_size)
 
     while running:
+        mouse_pos = pygame.mouse.get_pos()  # マウスカーソルの位置を取得
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    selected_option = (selected_option - 1) % len(options)
-                elif event.key == pygame.K_DOWN:
-                    selected_option = (selected_option + 1) % len(options)
-                elif event.key == pygame.K_RETURN:
-                    if options[selected_option] == "Start Game":
-                        running = False  # ゲームスタート
-                    elif options[selected_option] == "Exit":
-                        pygame.quit()
-                        exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # 左クリック
-                    mouse_pos = pygame.mouse.get_pos()
                     for i, option in enumerate(options):
+                        # オプションの矩形を計算
                         text_surface = menu_font.render(option, True, (255, 255, 255))
                         text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
-                        if text_rect.collidepoint(mouse_pos):
+                        if text_rect.collidepoint(mouse_pos):  # マウスが矩形内にある場合
                             if options[i] == "Start Game":
                                 running = False  # ゲームスタート
                             elif options[i] == "Exit":
@@ -92,9 +83,17 @@ def main_menu():
 
         # メニューオプションを描画
         for i, option in enumerate(options):
-            color = (255, 255, 0) if i == selected_option else (255, 255, 255)
+            # マウスがオプションの上にあるかをチェック
+            text_surface = menu_font.render(option, True, (255, 255, 255))
+            text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
+            if text_rect.collidepoint(mouse_pos):  # マウスが文字に重なっている場合
+                color = (255, 255, 0)  # 選択された色
+                selected_option = i
+            else:
+                color = (255, 255, 255)  # 通常の色
+
+            # テキストを描画
             text_surface = menu_font.render(option, True, color)
-            text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))  # 選択肢の間隔を調整
             screen.blit(text_surface, text_rect)
 
         # 画面更新
