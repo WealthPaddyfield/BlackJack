@@ -34,33 +34,35 @@ def load_menu_background(path):
         print(f"Error: Background image '{path}' not found. Using default background.")
         return pygame.image.load(DEFAULT_MENU_BACKGROUND).convert()
     
+
+def handle_mouse_hover(options, mouse_pos, start_y, option_height, font_size):
+    """
+    Determine which menu option is hovered over by the mouse.
+    """
+    for i, option in enumerate(options):
+        option_rect = pygame.Rect(WIDTH // 2 - 100, start_y + i * option_height, 200, font_size)
+        if option_rect.collidepoint(mouse_pos):
+            return i
+    return -1
+
 def main_menu():
     """メインメニューを表示する"""
     running = True
     background = load_menu_background(menu_background_path)
     background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # 画面サイズに調整
 
+    selected_option = 0  # 選択肢のインデックス
+    options = ["Start Game","How to play", "Exit"]
+
+    # フォントを指定
+    font_path = os.path.join(current_dir, "Game", "assets", "fonts", "NotoSans-Italic-VariableFont_wdth,wght.ttf")  # フォントファイルのパス
+    font_size = 40  # フォントサイズ
+    menu_font = pygame.font.Font(font_path, font_size)
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
-        # 背景を描画
-        screen.blit(background, (0, 0))
-
-        selected_option = 0  # 選択肢のインデックス
-        options = ["Start Game", "Exit"]
-
-        # メニューオプションを表示
-        for i, option in enumerate(options):
-            color = (255, 255, 0) if i == selected_option else (255, 255, 255)
-            display_text(option, WIDTH // 2 - 80, HEIGHT // 2 + i * 50, color=color)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                menu_running = False
-                pygame.quit()
-                exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     selected_option = (selected_option - 1) % len(options)
@@ -68,17 +70,39 @@ def main_menu():
                     selected_option = (selected_option + 1) % len(options)
                 elif event.key == pygame.K_RETURN:
                     if options[selected_option] == "Start Game":
-                        menu_running = False
+                        running = False  # ゲームスタート
                     elif options[selected_option] == "Exit":
                         pygame.quit()
                         exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # 左クリック
+                    mouse_pos = pygame.mouse.get_pos()
+                    for i, option in enumerate(options):
+                        text_surface = menu_font.render(option, True, (255, 255, 255))
+                        text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
+                        if text_rect.collidepoint(mouse_pos):
+                            if options[i] == "Start Game":
+                                running = False  # ゲームスタート
+                            elif options[i] == "Exit":
+                                pygame.quit()
+                                exit()
+
+        # 背景を描画
+        screen.blit(background, (0, 0))
+
+        # メニューオプションを描画
+        for i, option in enumerate(options):
+            color = (255, 255, 0) if i == selected_option else (255, 255, 255)
+            text_surface = menu_font.render(option, True, color)
+            text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))  # 選択肢の間隔を調整
+            screen.blit(text_surface, text_rect)
 
         # 画面更新
         pygame.display.flip()
 
     pygame.quit()
 
-# メインメニューの実行
+# メインメニューを表示
 if __name__ == "__main__":
     main_menu()
 
