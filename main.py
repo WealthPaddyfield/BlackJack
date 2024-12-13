@@ -50,66 +50,6 @@ def handle_mouse_hover(options, mouse_pos, start_y, option_height, font_size):
             return i
     return -1
 
-def main_menu():
-    """メインメニューを表示する"""
-    running = True
-    background = load_menu_background(menu_background_path)
-    background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # 画面サイズに調整
-
-    selected_option = -1  # 現在選択されているオプションのインデックス (-1は何も選択されていない状態)
-    options = ["Start Game", "How to play","Exit"]
-
-    # フォントを指定
-    font_path = os.path.join(current_dir, "Game", "assets", "fonts", "NotoSans-Italic-VariableFont_wdth,wght.ttf")  # フォントファイルのパス
-    font_size = 40  # フォントサイズ
-    menu_font = pygame.font.Font(font_path, font_size)
-
-    while running:
-        mouse_pos = pygame.mouse.get_pos()  # マウスカーソルの位置を取得
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:  # 左クリック
-                    for i, option in enumerate(options):
-                        # オプションの矩形を計算
-                        text_surface = menu_font.render(option, True, (255, 255, 255))
-                        text_rect = text_surface.get_rect(center=(WIDTH // 2 + 11450, HEIGHT // 2 + i * 70))
-                        if text_rect.collidepoint(mouse_pos):  # マウスが矩形内にある場合
-                            if options[i] == "Start Game":
-                                running = False  # ゲームスタート
-                            elif options[i] == "Exit":
-                                pygame.quit()
-                                exit()
-
-        # 背景を描画
-        screen.blit(background, (0, 0))
-
-        # メニューオプションを描画
-        for i, option in enumerate(options):
-            # マウスがオプションの上にあるかをチェック
-            text_surface = menu_font.render(option, True, (255, 255, 255))
-            text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
-            if text_rect.collidepoint(mouse_pos):  # マウスが文字に重なっている場合
-                color = (255, 255, 0)  # 選択された色
-                selected_option = i
-            else:
-                color = (255, 255, 255)  # 通常の色
-
-            # テキストを描画
-            text_surface = menu_font.render(option, True, color)
-            screen.blit(text_surface, text_rect)
-
-        # 画面更新
-        pygame.display.flip()
-
-    pygame.quit()
-
-# メインメニューを表示
-if __name__ == "__main__":
-    main_menu()
-
 #メインメニュークラス
 def show_main_menu():
     menu_running = True
@@ -199,6 +139,10 @@ def generate_deck():
     return deck
 
 # ブラックジャックのメインゲームループ
+    pygame.quit()
+
+
+# ブラックジャックのメインゲームループ
 def game_loop():
     show_main_menu()
     deck = generate_deck()
@@ -277,17 +221,129 @@ def game_loop():
         pygame.display.flip()
         clock.tick(30)
 
-    # ゲーム終了後、ウィンドウを閉じるまで待機
-    waiting = True
-    while waiting:
+def how_to_play_screen():
+    """How to Playの説明画面"""
+    running = True
+    background = load_menu_background(menu_background_path)
+    background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # 背景画像を調整
+
+    # フォントを指定
+    font_path = os.path.join(current_dir, "Game", "assets", "fonts", "NotoSans-Italic-VariableFont_wdth,wght.ttf")
+    title_font = pygame.font.Font(font_path, 50)  # タイトル用の大きいフォント
+    text_font = pygame.font.Font(font_path, 30)  # 説明文用のフォント
+
+    # How to Playの内容
+    instructions = [
+        "Welcome to Blackjack!",
+        "Objective: Get as close to 21 as possible without exceeding it.",
+        "Card Values:",
+        "- Number cards: Face value",
+        "- Face cards (J, Q, K): 10 points each",
+        "- Ace: 1 or 11 points",
+        "",
+        "Controls:",
+        "- 'H' to Hit (draw a card)",
+        "- 'S' to Stand (end your turn)",
+        "- 'Esc' to Exit",
+    ]
+
+    while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                waiting = False
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                waiting = False
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:  # ESCキーでメインメニューに戻る
+                    running = False
+
+        # 背景を描画
+        screen.blit(background, (0, 0))
+
+        # タイトルを描画
+        title_surface = title_font.render("How to Play", True, (255, 255, 255))
+        title_rect = title_surface.get_rect(center=(WIDTH // 2, 100))
+        screen.blit(title_surface, title_rect)
+
+        # 説明文を描画
+        for i, line in enumerate(instructions):
+            text_surface = text_font.render(line, True, (255, 255, 255))
+            text_rect = text_surface.get_rect(topleft=(50, 200 + i * 40))
+            screen.blit(text_surface, text_rect)
+
+        # メッセージを表示（メインメニューに戻る方法）
+        back_text = text_font.render("Press ESC to return to Main Menu", True, (255, 255, 255))
+        back_rect = back_text.get_rect(center=(WIDTH // 2, HEIGHT - 50))
+        screen.blit(back_text, back_rect)
+
+        # 画面更新
+        pygame.display.flip()
+
+    # メインメニューに戻る
+    main_menu()
+
+
+def main_menu():
+    """メインメニューを表示する"""
+    running = True
+    background = load_menu_background(menu_background_path)
+    background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # 画面サイズに調整
+
+    options = ["Start Game", "How to play", "Exit"]
+
+    # フォントを指定
+    font_path = os.path.join(current_dir, "Game", "assets", "fonts", "NotoSans-Italic-VariableFont_wdth,wght.ttf")
+    font_size = 40  # フォントサイズ
+    menu_font = pygame.font.Font(font_path, font_size)
+
+    while running:
+        mouse_pos = pygame.mouse.get_pos()  # マウスカーソルの位置を取得
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # 左クリック
+                    for i, option in enumerate(options):
+                        # オプションの矩形を計算
+                        text_surface = menu_font.render(option, True, (255, 255, 255))
+                        text_rect = text_surface.get_rect(center=(WIDTH // 2 + 200, HEIGHT // 2 + i * 70))
+                        if text_rect.collidepoint(mouse_pos):  # マウスが矩形内にある場合
+                            if options[i] == "Start Game":
+                                running = False  # メインメニューを終了
+                                game_loop()  # ゲームループを開始
+                            elif options[i] == "How to play":
+                                running = False
+                                how_to_play_screen()
+                            elif options[i] == "Exit":
+                                pygame.quit()
+                                exit()
+
+        # 背景を描画
+        screen.blit(background, (0, 0))
+
+        # メニューオプションを描画
+        for i, option in enumerate(options):
+            # マウスがオプションの上にあるかをチェック
+            text_surface = menu_font.render(option, True, (255, 255, 255))
+            text_rect = text_surface.get_rect(center=(WIDTH // 2 + 200, HEIGHT // 2 + i * 70))
+            if text_rect.collidepoint(mouse_pos):  # マウスが文字に重なっている場合
+                color = (255, 255, 0)  # 選択された色
+            else:
+                color = (255, 255, 255)  # 通常の色
+
+            # テキストを描画
+            text_surface = menu_font.render(option, True, color)
+            text_rect = text_surface.get_rect(center=(WIDTH // 2 + 200, HEIGHT // 2 + i * 70))
+            screen.blit(text_surface, text_rect)
+
+        # 画面更新
         pygame.display.flip()
 
     pygame.quit()
 
+# ゲームの実行（エントリーポイント）
+if __name__ == "__main__":
+    main_menu()
+
 # ゲームの実行
 game_loop()
+
