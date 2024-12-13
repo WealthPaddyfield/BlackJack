@@ -224,11 +224,12 @@ def game_loop():
 def how_to_play_screen():
     """How to Playの説明画面"""
     running = True
-    background = load_menu_background(menu_background_path)
+    how_to_play_background_path = os.path.join(current_dir, "Game", "assets", "main menu", "Main_menu.jpg")
+    background = pygame.image.load(how_to_play_background_path)
     background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # 背景画像を調整
 
     # フォントを指定
-    font_path = os.path.join(current_dir, "Game", "assets", "fonts", "NotoSans-Italic-VariableFont_wdth,wght.ttf")
+    font_path = os.path.join(current_dir, "Game", "assets", "fonts", "NotoSans-VariableFont_wdth,wght.ttf")
     title_font = pygame.font.Font(font_path, 50)  # タイトル用の大きいフォント
     text_font = pygame.font.Font(font_path, 30)  # 説明文用のフォント
 
