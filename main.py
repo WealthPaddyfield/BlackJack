@@ -2,11 +2,16 @@ import pygame
 import random
 import os
 
+#  high DPI mode
+os.environ['SDL_VIDEO_HIGHDPI_FULLSCREEN_SPACES'] = '1'
+os.environ['SDL_VIDEO_ALLOW_HIGHDPI'] = '1'
+
 # Pygameの初期設定
 pygame.init()
 
 screen_info = pygame.display.Info()  # スクリーンサイズの取得
 WIDTH, HEIGHT = screen_info.current_w, screen_info.current_h  # 画面解像度を取得
+print(f"Screen resolution: {WIDTH} x {HEIGHT}")
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)  # フルスクリーンモード
 pygame.display.set_caption("Blackjack Game")
 font = pygame.font.SysFont("arial", 24)
@@ -70,7 +75,7 @@ def main_menu():
                     for i, option in enumerate(options):
                         # オプションの矩形を計算
                         text_surface = menu_font.render(option, True, (255, 255, 255))
-                        text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 70))
+                        text_rect = text_surface.get_rect(center=(WIDTH // 2 + 11450, HEIGHT // 2 + i * 70))
                         if text_rect.collidepoint(mouse_pos):  # マウスが矩形内にある場合
                             if options[i] == "Start Game":
                                 running = False  # ゲームスタート
